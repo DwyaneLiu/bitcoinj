@@ -76,18 +76,4 @@ public interface KeyChainFactory {
      */
     DeterministicKeyChain makeSpendingKeyChain(Protos.Key key, Protos.Key firstSubKey, DeterministicKey accountKey,
                                                       boolean isMarried) throws UnreadableWalletException;
-
-    /**
-     * Make a spending keychain.
-     *
-     * <p>isMarried and isFollowingKey must not be true at the same time.
-     *
-     * @param key the protobuf for the account key
-     * @param firstSubKey the protobuf for the first child key (normally the parent of the external subchain)
-     * @param accountKey the account extended public key
-     * @param isMarried whether the keychain is leading in a marriage
-     */
-    DeterministicKeyChain makeSpendingKeyChain(Protos.Key key, Protos.Key firstSubKey, DeterministicKey accountKey,
-                                               boolean isMarried, ImmutableList<ChildNumber> accountPath)
-            throws UnreadableWalletException;
 }
