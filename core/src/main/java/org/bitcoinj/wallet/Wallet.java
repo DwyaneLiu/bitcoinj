@@ -330,7 +330,7 @@ public class Wallet extends BaseTaggableObject
      */
     public static Wallet fromMasterKey(NetworkParameters params, DeterministicKey masterKey, int accountNumber) {
         DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(masterKey, new ChildNumber(accountNumber, true));
-        accountKey = accountKey.dropParent();
+        accountKey = accountKey.dropParent(false);
         accountKey.setCreationTimeSeconds(masterKey.getCreationTimeSeconds());
         return new Wallet(params, KeyChainGroup.createSpendingOrWatchingKeyChainGroup(params,
                 accountKey,true));

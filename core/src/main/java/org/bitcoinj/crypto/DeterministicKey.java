@@ -279,6 +279,26 @@ public class DeterministicKey extends ECKey {
         return key;
     }
 
+    /**
+     * <p>Returns the same key with the parent pointer removed </p>
+     *
+     * @param keepFullPath If true, then call dropParent() and the resulting key will still know its own path and parent fingerprint.
+     *                       If false, then the resulting key will only know its relative path but will keep its parent fingerprint.
+     *
+     * <p>If this key doesn't have private key bytes stored/cached itself, but could rederive them from the parent, then
+     * the new key returned by this method won't be able to do that. Thus, using dropPrivateBytes().dropParent() on a
+     * regular DeterministicKey will yield a new DeterministicKey that cannot sign or do other things involving the
+     * private key at all.</p>
+     */
+    public DeterministicKey dropParent(boolean keepFullPath) {
+        if(keepFullPath)
+            return dropParent();
+
+        DeterministicKey key = new DeterministicKey(ImmutableList.of(getChildNumber()), getChainCode(), pub, priv, null);
+        key.parentFingerprint = parentFingerprint;
+        return key;
+    }
+
     static byte[] addChecksum(byte[] input) {
         int inputLength = input.length;
         byte[] checksummed = new byte[inputLength + 4];

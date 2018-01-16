@@ -591,7 +591,8 @@ public class DeterministicKeyChainTest {
 
         //Simulate Wallet.fromMasterKey(params, coinLevelKey, 0)
 
-        DeterministicKey accountKey = HDKeyDerivation.deriveChildKeyWithNoParent(coinLevelKey, new ChildNumber(0, true));
+        DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinLevelKey, new ChildNumber(0, true));
+        accountKey = accountKey.dropParent(false);
         accountKey.setCreationTimeSeconds(watchingKey.getCreationTimeSeconds());
         KeyChainGroup group = KeyChainGroup.createSpendingOrWatchingKeyChainGroup(params, accountKey,true);
         DeterministicKeyChain bip44chain2 = group.getActiveKeyChain();

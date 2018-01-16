@@ -329,6 +329,7 @@ public class DeterministicKeyChain implements EncryptableKeyChain {
         this.rootKey = null;
         basicKeyChain.importKey(watchingKey);
         hierarchy = new DeterministicHierarchy(watchingKey);
+        accountPath = watchingKey.getPath();
         initializeHierarchyUnencrypted(watchingKey);
     }
 
@@ -336,12 +337,11 @@ public class DeterministicKeyChain implements EncryptableKeyChain {
      * Creates a deterministic key chain
      * @param isWatching if true, then creates a deterministic key chain that watches the given (public only) root key or can spend from that root key. You can use this to calculate
      * balances and generally follow along, but spending is not possible with such a chain. If false, then creates a deterministic key chain that allows spending.
-     * Currently you can't use
-     * this method to watch an arbitrary fragment of some other tree, this limitation may be removed in future.
+     * Currently you can't use this method to watch or spend from an arbitrary fragment of some other tree, this limitation may be removed in future.
      */
     public DeterministicKeyChain(DeterministicKey key, boolean isFollowing, boolean isWatching) {
         if(isWatching)
-            checkArgument(key.isPubKeyOnly(), "Private subtrees not currently supported: if you got this key from DKC.getWatchingKey() then use .dropPrivate().dropParent() on it first.");
+            checkArgument(key.isPubKeyOnly(), "Private subtrees not currently supported for watching keys: if you got this key from DKC.getWatchingKey() then use .dropPrivate().dropParent() on it first.");
         else
             checkArgument(key.hasPrivKey(), "Private subtrees are required.");
         checkArgument(isWatching ? true : !isFollowing, "Cannot follow a key that is not watched");
