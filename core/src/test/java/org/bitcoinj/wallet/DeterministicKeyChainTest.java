@@ -558,7 +558,7 @@ public class DeterministicKeyChainTest {
         } catch (ECKey.MissingPrivateKeyException e) {
             fail();
         }
-        // Test we can serialize and deserialize a watching chain OK.
+        // Test we can serialize and deserialize a spending chain OK.
         List<Protos.Key> serialization = chain.serializeToProtobuf();
         checkSerialization(serialization, "spending-wallet-account-two-serialization.txt");
         chain = DeterministicKeyChain.fromProtobuf(serialization, null).get(0);
@@ -592,15 +592,15 @@ public class DeterministicKeyChainTest {
         //Simulate Wallet.fromMasterKey(params, coinLevelKey, 0)
 
         DeterministicKey accountKey = HDKeyDerivation.deriveChildKey(coinLevelKey, new ChildNumber(0, true));
-        accountKey = accountKey.dropParent(false);
+        accountKey = accountKey.dropParent();
         accountKey.setCreationTimeSeconds(watchingKey.getCreationTimeSeconds());
-        KeyChainGroup group = KeyChainGroup.createSpendingOrWatchingKeyChainGroup(params, accountKey,true);
+        KeyChainGroup group = new KeyChainGroup(params, accountKey, false);//KeyChainGroup.createSpendingOrWatchingKeyChainGroup(params, accountKey,true);
         DeterministicKeyChain bip44chain2 = group.getActiveKeyChain();
         assertEquals(secs, bip44chain2.getEarliestKeyCreationTime());
         bip44chain2.setLookaheadSize(10);
         bip44chain2.maybeLookAhead();
 
-        //verify that the keys are the same as the original bip44chain
+        //verify that the keys are the same as the original bip44chain (from serializedB58)
         assertEquals(key1.getPubKeyPoint(), bip44chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS).getPubKeyPoint());
         assertEquals(key2.getPubKeyPoint(), bip44chain.getKey(KeyChain.KeyPurpose.RECEIVE_FUNDS).getPubKeyPoint());
         final DeterministicKey key = bip44chain.getKey(KeyChain.KeyPurpose.CHANGE);
@@ -624,7 +624,7 @@ public class DeterministicKeyChainTest {
             fail();
         }
 
-        // Test we can serialize and deserialize a spending chain OK
+        // Test we can serialize and deserialize a spending chain OK (from serializedB58)
         List<Protos.Key> serialization = bip44chain.serializeToProtobuf();
         checkSerialization(serialization, "spending-wallet-from-bip44-serialization.txt");
 
@@ -634,7 +634,7 @@ public class DeterministicKeyChainTest {
 
         // Test we can serialize and deserialize a spending chain OK
         List<Protos.Key> serialization2 = bip44chain2.serializeToProtobuf();
-        checkSerialization(serialization2, "spending-wallet-from-bip44-serialization.txt");
+        checkSerialization(serialization2, "spending-wallet-from-bip44-serialization-two.txt");
 
         bip44chain2 = DeterministicKeyChain.fromProtobuf(serialization2, null).get(0);
 
@@ -643,7 +643,7 @@ public class DeterministicKeyChainTest {
         // Test we can serialize and deserialize a spending chain OK, after it was already serialized and deserialized.
 
         List<Protos.Key> serialization3 = bip44chain2.serializeToProtobuf();
-        checkSerialization(serialization3, "spending-wallet-from-bip44-serialization.txt");
+        checkSerialization(serialization3, "spending-wallet-from-bip44-serialization-two.txt");
 
         final DeterministicKey rekey4a = bip44chain2.getKey(KeyChain.KeyPurpose.CHANGE);
         assertEquals(key4.getPubKeyPoint(), rekey4a.getPubKeyPoint());
